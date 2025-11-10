@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
@@ -20,16 +21,16 @@ class CurrencyRate
     #[ORM\JoinColumn(name: 'currency_id', referencedColumnName: 'id', nullable: false)]
     private Currency $currency;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 6)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 4)]
     private string $value;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private \DateTimeInterface $date;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private DateTimeInterface $date;
 
     public function __construct(
         Currency $currency,
         string $value,
-        \DateTimeInterface $date,
+        DateTimeInterface $date,
     )
     {
         $this->currency = $currency;
@@ -52,7 +53,7 @@ class CurrencyRate
         return $this->value;
     }
 
-    public function getDate(): \DateTimeInterface
+    public function getDate(): DateTimeInterface
     {
         return $this->date;
     }
