@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
+// глобальны exception листенер, все не отловленные ошибки будут сюда приходить
 class ExceptionListener
 {
     public function __construct(private LoggerInterface $logger)
