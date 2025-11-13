@@ -38,6 +38,20 @@ class CreateCurrencyCommand extends Command
         $charCode = $input->getArgument('charCode');
         $name = $input->getArgument('name');
 
+        // давай представим что уже есть в БД запись
+        // id|num_code|char_code|name|
+        // --+--------+---------+----+
+        //  1| 840    | USD     | Доллар
+        // и админ через консоль вводит опять эту же валюту
+        // php bin/console numCode=840 charCode='USD' name='Доллар'
+        // и произойдет ошибка на уникальные ключи, потому что уже есть эти numCode и charCode
+        // что надо сделать надо удостовериться что в БД нету этих данных через методы
+        // \App\Repository\CurrencyRepository::findByNumCode
+        // \App\Repository\CurrencyRepository::findByCharCode
+        // и получается что ты пишешь тот же код, который уже есть в
+        // \App\Service\CurrencyService::create
+        // поэтому тут тебе надо вызвать \App\Service\CurrencyService::create
+
         $currency = new Currency($numCode, $charCode, $name);
 
         $this->em->persist($currency);
