@@ -9,6 +9,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 abstract class BaseController extends AbstractController
 {
+    // создать класс ResponseFactory в который перенести все эти методы
     public function createResponseSuccess(mixed $data): JsonResponse
     {
         return $this->json($data);

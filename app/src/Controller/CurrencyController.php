@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\DTO\CurrencyCreationDto;
 use App\Exception\FailedCurrencyCreationException;
+use App\Exception\NotFoundException;
+use App\Repository\CurrencyRepository;
 use App\Service\CurrencyService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,6 +17,7 @@ class CurrencyController extends BaseController
 {
     public function __construct(
         private CurrencyService $currencyService,
+        private CurrencyRepository $currencyRepository,
         private ValidatorInterface $validator,
         private LoggerInterface $logger
     ) {
@@ -51,10 +54,14 @@ class CurrencyController extends BaseController
     #[Route('/currencies/{id}', name: 'get_currency', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function get(int $id): JsonResponse
     {
-        $currency = $this->currencyService->show($id);
-        if ($currency === null) {
-            return $this->createResponseNotFound(['error' => sprintf('Currency (id: %d) not found', $id)]);
+        try {
+            $currency = $this->currencyRepository->getById($id);
+        } catch (NotFoundException $exception) {
+            $this->logger->error($exception->getMessage());
+
+            return $this->createResponseNotFound(['error' => $exception->getMessage()]);
         }
+
 
         return $this->createResponseSuccess(
             [
@@ -65,4 +72,6 @@ class CurrencyController extends BaseController
             ]
         );
     }
+
+
 }

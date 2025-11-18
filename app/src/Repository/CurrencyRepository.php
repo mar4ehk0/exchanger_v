@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Currency;
+use App\Exception\NotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Exception;
 
 class CurrencyRepository
 {
@@ -23,6 +25,16 @@ class CurrencyRepository
         }
 
         return null;
+    }
+
+    public function getById(int $id): Currency
+    {
+        $currency = $this->repo->find($id);
+        if ($currency instanceof Currency) {
+            return $currency;
+        }
+
+        throw new NotFoundException(Currency::class, $id);
     }
 
     public function findByNumCode(string $numCode): ?Currency
