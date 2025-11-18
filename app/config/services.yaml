@@ -22,3 +22,7 @@ services:
     App\Listener\ExceptionListener:
       tags:
         - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
+    App\Listener\MigrationEventListener:
+      tags:
+        - { name: doctrine.event_listener, event: postGenerateSchema, connection: default }
