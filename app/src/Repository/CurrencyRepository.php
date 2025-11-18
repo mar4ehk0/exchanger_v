@@ -15,6 +15,16 @@ class CurrencyRepository
         $this->repo = $this->em->getRepository(Currency::class);
     }
 
+    public function findById(int $id): ?Currency
+    {
+        $currency = $this->repo->findOneBy(['id' => $id]);
+        if ($currency instanceof Currency) {
+            return $currency;
+        }
+
+        return null;
+    }
+
     public function findByNumCode(string $numCode): ?Currency
     {
         $currency = $this->repo->findBy(['numCode' => $numCode]);
@@ -33,7 +43,6 @@ class CurrencyRepository
         }
 
         return null;
-
     }
 
     public function add(Currency $currency): void

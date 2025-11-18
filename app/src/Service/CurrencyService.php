@@ -16,6 +16,13 @@ class CurrencyService
     ) {
     }
 
+    public function show(int $id): ?Currency
+    {
+        $currency = $this->repository->findById($id);
+
+        return $currency;
+    }
+
     /**
      * @throws FailedCurrencyCreationException
      */
