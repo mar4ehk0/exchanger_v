@@ -23,17 +23,18 @@ class CurrencyController extends BaseController
     public function get(int $id)
     {
         $currency = $this->currencyService->show($id);
-
         if (! $currency) {
-            return $this->json(['error' => 'Currency not found'], 404);
+            return $this->createResponseNotFound(['error' => 'Currency not found']);
         }
 
-        return $this->json([
-            'id' => $currency->getId(),
-            'num_code' => $currency->getNumCode(),
-            'char_code' => $currency->getCharCode(),
-            'name' => $currency->getName(),
-        ]);
+        return $this->createResponseSuccess(
+            [
+                'id' => $currency->getId(),
+                'num_code' => $currency->getNumCode(),
+                'char_code' => $currency->getCharCode(),
+                'name' => $currency->getName(),
+            ]
+        );
     }
 
     #[Route('/currencies', name: 'create_currency', methods: ['POST'])]
