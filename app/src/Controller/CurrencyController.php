@@ -6,6 +6,7 @@ use App\DTO\CurrencyCreationDto;
 use App\Exception\FailedCurrencyCreationException;
 use App\Service\CurrencyService;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -19,26 +20,8 @@ class CurrencyController extends BaseController
     ) {
     }
 
-    #[Route('/currencies/{id}', name: 'get_currency', methods: ['GET'])]
-    public function get(int $id)
-    {
-        $currency = $this->currencyService->show($id);
-        if (! $currency) {
-            return $this->createResponseNotFound(['error' => 'Currency not found']);
-        }
-
-        return $this->createResponseSuccess(
-            [
-                'id' => $currency->getId(),
-                'num_code' => $currency->getNumCode(),
-                'char_code' => $currency->getCharCode(),
-                'name' => $currency->getName(),
-            ]
-        );
-    }
-
     #[Route('/currencies', name: 'create_currency', methods: ['POST'])]
-    public function create(Request $request)
+    public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $dto = CurrencyCreationDto::createFromArray($data);
@@ -53,6 +36,24 @@ class CurrencyController extends BaseController
             $this->logger->error($exception->systemMessage);
 
             return $this->createResponseInternalServerError($exception->humanMessage);
+        }
+
+        return $this->createResponseSuccess(
+            [
+                'id' => $currency->getId(),
+                'num_code' => $currency->getNumCode(),
+                'char_code' => $currency->getCharCode(),
+                'name' => $currency->getName(),
+            ]
+        );
+    }
+
+    #[Route('/currencies/{id}', name: 'get_currency', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function get(int $id): JsonResponse
+    {
+        $currency = $this->currencyService->show($id);
+        if ($currency === null) {
+            return $this->createResponseNotFound(['error' => sprintf('Currency (id: %d) not found', $id)]);
         }
 
         return $this->createResponseSuccess(
