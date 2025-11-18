@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\CurrencyCreationDto;
+use App\DTO\CurrencyUpdateDto;
 use App\Exception\FailedCurrencyCreationException;
 use App\Exception\NotFoundException;
 use App\Repository\CurrencyRepository;
@@ -19,7 +20,7 @@ class CurrencyController extends BaseController
         private CurrencyService $currencyService,
         private CurrencyRepository $currencyRepository,
         private ValidatorInterface $validator,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -47,7 +48,7 @@ class CurrencyController extends BaseController
                 'num_code' => $currency->getNumCode(),
                 'char_code' => $currency->getCharCode(),
                 'name' => $currency->getName(),
-            ]
+            ],
         );
     }
 
@@ -62,16 +63,42 @@ class CurrencyController extends BaseController
             return $this->createResponseNotFound(['error' => $exception->getMessage()]);
         }
 
-
         return $this->createResponseSuccess(
             [
                 'id' => $currency->getId(),
                 'num_code' => $currency->getNumCode(),
                 'char_code' => $currency->getCharCode(),
                 'name' => $currency->getName(),
-            ]
+            ],
         );
     }
 
+    #[Route('/currencies/{id}', name: 'update_currency', requirements: ['id' => '\d+'], methods: ['PUT'])]
+    public function update(int $id, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $data['id'] = $id;
+        $dto = CurrencyUpdateDto::createFromArray($data);
 
+        $errors = $this->validator->validate($dto);
+        if (count($errors) > 0) {
+            return $this->createResponseBadRequest($errors);
+        }
+
+        $currency = $this->currencyService->update($dto);
+        return $this->createResponseSuccess(
+            [
+                'id' => $currency->getId(),
+                'num_code' => $currency->getNumCode(),
+                'char_code' => $currency->getCharCode(),
+                'name' => $currency->getName(),
+            ],
+        );
+    }
+
+//    #[Route('/currencies/{id}', name: 'delete_currency', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+//    public function delete(int $id, Request $request): JsonResponse
+//    {
+//
+//    }
 }
