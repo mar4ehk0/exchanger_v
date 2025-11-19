@@ -98,9 +98,17 @@ class CurrencyController extends BaseController
         );
     }
 
-//    #[Route('/currencies/{id}', name: 'delete_currency', requirements: ['id' => '\d+'], methods: ['DELETE'])]
-//    public function delete(int $id, Request $request): JsonResponse
-//    {
-//
-//    }
+    #[Route('/currencies/{id}', name: 'delete_currency', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
+    {
+        try {
+            $currency = $this->currencyService->delete($id);
+        } catch (NotFoundException $exception) {
+            $this->logger->error($exception->getMessage());
+
+            return $this->responseFactory->createResponseNotFound(['error' => $exception->getMessage()]);
+        }
+
+        return $this->responseFactory->createResponseSuccess(['status' => 'deleted']);
+    }
 }

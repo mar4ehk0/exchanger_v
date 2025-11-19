@@ -71,4 +71,15 @@ class CurrencyService
 
         return $currency;
     }
+
+    public function delete(int $id): void
+    {
+        $currency = $this->repository->findById($id);
+        if ($currency === null) {
+            throw new NotFoundException(Currency::class, $id);
+        }
+
+        $this->repository->delete($currency);
+        $this->em->flush();
+    }
 }

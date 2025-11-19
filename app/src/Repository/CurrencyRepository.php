@@ -62,4 +62,8 @@ class CurrencyRepository
         $this->em->persist($currency);
     }
 
+    public function delete(Currency $currency): void
+    {
+        $this->em->remove($currency);
+    }
 }
