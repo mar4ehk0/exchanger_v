@@ -6,6 +6,7 @@ use App\DTO\CurrencyCreationDto;
 use App\DTO\CurrencyUpdateDto;
 use App\Exception\FailedCurrencyCreationException;
 use App\Exception\NotFoundException;
+use App\Factory\ResponseFactory;
 use App\Repository\CurrencyRepository;
 use App\Service\CurrencyService;
 use Psr\Log\LoggerInterface;
@@ -19,6 +20,7 @@ class CurrencyController extends BaseController
     public function __construct(
         private CurrencyService $currencyService,
         private CurrencyRepository $currencyRepository,
+        private ResponseFactory $responseFactory,
         private ValidatorInterface $validator,
         private LoggerInterface $logger,
     ) {
@@ -31,7 +33,7 @@ class CurrencyController extends BaseController
         $dto = CurrencyCreationDto::createFromArray($data);
         $errors = $this->validator->validate($dto);
         if (count($errors) > 0) {
-            return $this->createResponseBadRequest($errors);
+            return $this->responseFactory->createResponseBadRequest($errors);
         }
 
         try {
@@ -39,10 +41,10 @@ class CurrencyController extends BaseController
         } catch (FailedCurrencyCreationException $exception) {
             $this->logger->error($exception->systemMessage);
 
-            return $this->createResponseInternalServerError($exception->humanMessage);
+            return $this->responseFactory->createResponseInternalServerError($exception->humanMessage);
         }
 
-        return $this->createResponseSuccess(
+        return $this->responseFactory->createResponseSuccess(
             [
                 'id' => $currency->getId(),
                 'num_code' => $currency->getNumCode(),
@@ -60,10 +62,10 @@ class CurrencyController extends BaseController
         } catch (NotFoundException $exception) {
             $this->logger->error($exception->getMessage());
 
-            return $this->createResponseNotFound(['error' => $exception->getMessage()]);
+            return $this->responseFactory->createResponseNotFound(['error' => $exception->getMessage()]);
         }
 
-        return $this->createResponseSuccess(
+        return $this->responseFactory->createResponseSuccess(
             [
                 'id' => $currency->getId(),
                 'num_code' => $currency->getNumCode(),
@@ -82,11 +84,11 @@ class CurrencyController extends BaseController
 
         $errors = $this->validator->validate($dto);
         if (count($errors) > 0) {
-            return $this->createResponseBadRequest($errors);
+            return $this->responseFactory->createResponseBadRequest($errors);
         }
 
         $currency = $this->currencyService->update($dto);
-        return $this->createResponseSuccess(
+        return $this->responseFactory->createResponseSuccess(
             [
                 'id' => $currency->getId(),
                 'num_code' => $currency->getNumCode(),
