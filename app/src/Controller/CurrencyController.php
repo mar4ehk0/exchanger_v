@@ -20,10 +20,11 @@ class CurrencyController extends BaseController
     public function __construct(
         private CurrencyService $currencyService,
         private CurrencyRepository $currencyRepository,
-        private ResponseFactory $responseFactory,
+        ResponseFactory $responseFactory,
         private ValidatorInterface $validator,
         private LoggerInterface $logger,
     ) {
+        parent::__construct($responseFactory);
     }
 
     #[Route('/currencies', name: 'create_currency', methods: ['POST'])]
@@ -102,13 +103,18 @@ class CurrencyController extends BaseController
     public function delete(int $id): JsonResponse
     {
         try {
-            $currency = $this->currencyService->delete($id);
+            $currencyId = $this->currencyService->delete($id);
         } catch (NotFoundException $exception) {
             $this->logger->error($exception->getMessage());
 
             return $this->responseFactory->createResponseNotFound(['error' => $exception->getMessage()]);
         }
 
-        return $this->responseFactory->createResponseSuccess(['status' => 'deleted']);
+        return $this->responseFactory->createResponseSuccess(
+            [
+                'id' => $currencyId,
+                'status' => 'deleted',
+            ]
+        );
     }
 }

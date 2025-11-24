@@ -6,6 +6,7 @@ use App\DTO\CurrencyCreationDto;
 use App\DTO\CurrencyUpdateDto;
 use App\Entity\Currency;
 use App\Exception\FailedCurrencyCreationException;
+use App\Exception\FailedCurrencyUpdateException;
 use App\Exception\NotFoundException;
 use App\Repository\CurrencyRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -56,11 +57,11 @@ class CurrencyService
 
         $alreadyExistCurrencyNumCode = $this->repository->findByNumCode($dto->numCode);
         if ($alreadyExistCurrencyNumCode !== null && $alreadyExistCurrencyNumCode->getId() !== $currency->getId()) {
-//            throw FailedCurrencyUpdateException::numCodeNotUnique($dto->numCode);
+            throw FailedCurrencyUpdateException::numCodeNotUnique($dto->numCode);
         }
         $alreadyExistCurrencyCharCode = $this->repository->findByCharCode($dto->charCode);
         if ($alreadyExistCurrencyCharCode !== null && $alreadyExistCurrencyCharCode->getId() !== $currency->getId()) {
-//            throw FailedCurrencyUpdateException::charCodeNotUnique($dto->charCode);
+            throw FailedCurrencyUpdateException::charCodeNotUnique($dto->charCode);
         }
 
         $currency->setNumCode($dto->numCode);
@@ -72,14 +73,16 @@ class CurrencyService
         return $currency;
     }
 
-    public function delete(int $id): void
+    public function delete(int $id): int
     {
         $currency = $this->repository->findById($id);
         if ($currency === null) {
             throw new NotFoundException(Currency::class, $id);
         }
 
-        $this->repository->delete($currency);
+        $currencyId = $this->repository->delete($currency);
         $this->em->flush();
+
+        return $currencyId;
     }
 }

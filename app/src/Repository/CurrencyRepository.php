@@ -39,7 +39,7 @@ class CurrencyRepository
 
     public function findByNumCode(string $numCode): ?Currency
     {
-        $currency = $this->repo->findBy(['numCode' => $numCode]);
+        $currency = $this->repo->findOneBy(['numCode' => $numCode]);
         if ($currency instanceof Currency) {
             return $currency;
         }
@@ -49,7 +49,7 @@ class CurrencyRepository
 
     public function findByCharCode(string $charCode): ?Currency
     {
-        $currency = $this->repo->findBy(['charCode' => $charCode]);
+        $currency = $this->repo->findOneBy(['charCode' => $charCode]);
         if ($currency instanceof Currency) {
             return $currency;
         }
@@ -62,8 +62,12 @@ class CurrencyRepository
         $this->em->persist($currency);
     }
 
-    public function delete(Currency $currency): void
+    public function delete(Currency $currency): int
     {
+        $currencyId = $currency->getId();
         $this->em->remove($currency);
+        $this->em->flush();
+
+        return $currencyId;
     }
 }
