@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\DTO\CurrencyCreationDto;
 use App\DTO\CurrencyUpdateDto;
 use App\Exception\FailedCurrencyCreationException;
-use App\Exception\NotFoundException;
 use App\Factory\ResponseFactory;
 use App\Repository\CurrencyRepository;
 use App\Service\CurrencyService;
@@ -58,13 +57,7 @@ class CurrencyController extends BaseController
     #[Route('/currencies/{id}', name: 'get_currency', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function get(int $id): JsonResponse
     {
-        try {
-            $currency = $this->currencyRepository->getById($id);
-        } catch (NotFoundException $exception) {
-            $this->logger->error($exception->getMessage());
-
-            return $this->responseFactory->createResponseNotFound(['error' => $exception->getMessage()]);
-        }
+        $currency = $this->currencyRepository->getById($id);
 
         return $this->responseFactory->createResponseSuccess(
             [
@@ -79,6 +72,8 @@ class CurrencyController extends BaseController
     #[Route('/currencies/{id}', name: 'update_currency', requirements: ['id' => '\d+'], methods: ['PUT'])]
     public function update(int $id, Request $request): JsonResponse
     {
+        // added some comments 12312312 3123 123 12
+
         $data = json_decode($request->getContent(), true);
         $data['id'] = $id;
         $dto = CurrencyUpdateDto::createFromArray($data);
@@ -102,13 +97,7 @@ class CurrencyController extends BaseController
     #[Route('/currencies/{id}', name: 'delete_currency', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
-        try {
-            $currencyId = $this->currencyService->delete($id);
-        } catch (NotFoundException $exception) {
-            $this->logger->error($exception->getMessage());
-
-            return $this->responseFactory->createResponseNotFound(['error' => $exception->getMessage()]);
-        }
+        $currencyId = $this->currencyService->delete($id);
 
         return $this->responseFactory->createResponseSuccess(
             [

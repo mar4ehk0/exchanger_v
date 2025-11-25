@@ -4,6 +4,7 @@ namespace App\Listener;
 
 use App\Exception\BaseServiceException;
 use App\Exception\DtoExceptionInterface;
+use App\Exception\NotFoundException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,6 +35,22 @@ class ExceptionListener
 
             $event->setResponse($response);
             $this->logger->error($exception->systemMessage);
+        }
+        if ($exception instanceof NotFoundException) {
+            $data['error']['struct_error'] = [
+                'code' => 'NOT_FOUND',
+                'message' => $exception->getMessage(),
+            ];
+
+            $response = new JsonResponse(
+                $data,
+                Response::HTTP_NOT_FOUND
+            );
+
+
+
+            $event->setResponse($response);
+            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
         }
     }
 }
