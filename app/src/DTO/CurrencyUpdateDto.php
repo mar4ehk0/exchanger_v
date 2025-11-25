@@ -2,16 +2,16 @@
 
 namespace App\DTO;
 
-use App\Exception\CurrencyCreationDtoException;
 use App\Exception\CurrencyUpdateDtoException;
 use App\Exception\DtoExceptionInterface;
+use App\Interface\JsonBodyDtoRequestInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-readonly class CurrencyUpdateDto implements DtoExceptionInterface
+readonly class CurrencyUpdateDto implements DtoExceptionInterface, JsonBodyDtoRequestInterface
 {
     public function __construct(
         #[Assert\NotBlank]
-        public string $id,
+        public int $id,
         #[Assert\NotBlank]
         public string $numCode,
         #[Assert\NotBlank]
