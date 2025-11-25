@@ -53,11 +53,15 @@ class CurrencyController extends BaseController
                 'name' => $currency->getName(),
             ],
         );
+
+
     }
 
     #[Route('/currencies/{id}', name: 'get_currency', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function get(int $id): JsonResponse
     {
+
+
         try {
             $currency = $this->currencyRepository->getById($id);
         } catch (NotFoundException $exception) {
@@ -65,6 +69,8 @@ class CurrencyController extends BaseController
 
             return $this->responseFactory->createResponseNotFound(['error' => $exception->getMessage()]);
         }
+
+
 
         return $this->responseFactory->createResponseSuccess(
             [
