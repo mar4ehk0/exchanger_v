@@ -56,4 +56,18 @@ class Currency
         return $this->name;
     }
 
+    public function setNumCode(string $numCode): void
+    {
+        $this->numCode = $numCode;
+    }
+
+    public function setCharCode(string $charCode): void
+    {
+        $this->charCode = $charCode;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
 }

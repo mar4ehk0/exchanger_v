@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\DTO\CurrencyCreationDto;
+use App\DTO\CurrencyUpdateDto;
 use App\Exception\FailedCurrencyCreationException;
 use App\Exception\NotFoundException;
+use App\Factory\ResponseFactory;
 use App\Repository\CurrencyRepository;
 use App\Service\CurrencyService;
 use Psr\Log\LoggerInterface;
@@ -18,9 +20,11 @@ class CurrencyController extends BaseController
     public function __construct(
         private CurrencyService $currencyService,
         private CurrencyRepository $currencyRepository,
+        ResponseFactory $responseFactory,
         private ValidatorInterface $validator,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
+        parent::__construct($responseFactory);
     }
 
     #[Route('/currencies', name: 'create_currency', methods: ['POST'])]
@@ -30,7 +34,7 @@ class CurrencyController extends BaseController
         $dto = CurrencyCreationDto::createFromArray($data);
         $errors = $this->validator->validate($dto);
         if (count($errors) > 0) {
-            return $this->createResponseBadRequest($errors);
+            return $this->responseFactory->createResponseBadRequest($errors);
         }
 
         try {
@@ -38,16 +42,16 @@ class CurrencyController extends BaseController
         } catch (FailedCurrencyCreationException $exception) {
             $this->logger->error($exception->systemMessage);
 
-            return $this->createResponseInternalServerError($exception->humanMessage);
+            return $this->responseFactory->createResponseInternalServerError($exception->humanMessage);
         }
 
-        return $this->createResponseSuccess(
+        return $this->responseFactory->createResponseSuccess(
             [
                 'id' => $currency->getId(),
                 'num_code' => $currency->getNumCode(),
                 'char_code' => $currency->getCharCode(),
                 'name' => $currency->getName(),
-            ]
+            ],
         );
     }
 
@@ -59,19 +63,58 @@ class CurrencyController extends BaseController
         } catch (NotFoundException $exception) {
             $this->logger->error($exception->getMessage());
 
-            return $this->createResponseNotFound(['error' => $exception->getMessage()]);
+            return $this->responseFactory->createResponseNotFound(['error' => $exception->getMessage()]);
         }
 
-
-        return $this->createResponseSuccess(
+        return $this->responseFactory->createResponseSuccess(
             [
                 'id' => $currency->getId(),
                 'num_code' => $currency->getNumCode(),
                 'char_code' => $currency->getCharCode(),
                 'name' => $currency->getName(),
-            ]
+            ],
         );
     }
 
+    #[Route('/currencies/{id}', name: 'update_currency', requirements: ['id' => '\d+'], methods: ['PUT'])]
+    public function update(int $id, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $data['id'] = $id;
+        $dto = CurrencyUpdateDto::createFromArray($data);
 
+        $errors = $this->validator->validate($dto);
+        if (count($errors) > 0) {
+            return $this->responseFactory->createResponseBadRequest($errors);
+        }
+
+        $currency = $this->currencyService->update($dto);
+        return $this->responseFactory->createResponseSuccess(
+            [
+                'id' => $currency->getId(),
+                'num_code' => $currency->getNumCode(),
+                'char_code' => $currency->getCharCode(),
+                'name' => $currency->getName(),
+            ],
+        );
+    }
+
+    #[Route('/currencies/{id}', name: 'delete_currency', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
+    {
+        try {
+            $currencyId = $this->currencyService->delete($id);
+        } catch (NotFoundException $exception) {
+            $this->logger->error($exception->getMessage());
+
+            return $this->responseFactory->createResponseNotFound(['error' => $exception->getMessage()]);
+        }
+
+        return $this->responseFactory->createResponseSuccess(
+            [
+                'id' => $currencyId,
+                'status' => 'deleted',
+            ]
+        );
+    }
 }
