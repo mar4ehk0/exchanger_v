@@ -3,8 +3,11 @@
 namespace App\DTO;
 
 use App\Exception\DtoExceptionInterface;
+use App\Interface\JsonBodyDtoRequestInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
-class CurrencyRateCreationDto implements DtoExceptionInterface
+// class CurrencyRateCreationDto implements DtoExceptionInterface
+class CurrencyRateCreationDto implements JsonBodyDtoRequestInterface
 {
     public function __construct(
         #[Assert\NotBlank]
