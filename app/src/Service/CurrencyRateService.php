@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\DTO\CurrencyRateCreationDto;
+use App\Entity\Currency;
 use App\Entity\CurrencyRate;
 use App\Exception\NotFoundException;
 use App\Repository\CurrencyRepository;
@@ -19,18 +20,16 @@ class CurrencyRateService
     }
 
     /**
-     * @throws FailedCurrencyCreationException
+     * @throws NotFoundException
      */
     public function create(CurrencyRateCreationDto $dto): CurrencyRate
     {
-        $currency = $this->repository->findById($dto->currency_id);
+        $currency = $this->repository->findById($dto->currencyId);
         if ($currency === null) {
-            throw new NotFoundException(Currency::class, $dto->currency_id);
+            throw new NotFoundException(Currency::class, $dto->currencyId);
         }
 
-        $date = new \DateTimeImmutable($dto->date);
-
-        $currencyRate = new CurrencyRate($currency, $dto->value, $date);
+        $currencyRate = new CurrencyRate($currency, $dto->value, $dto->date);
 
         $this->repositoryRate->add($currencyRate);
         $this->em->flush();
