@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Factory\ParseFactory;
 use App\HttpClient\CurrencyRateHttpClient;
+use App\Repository\CurrencyRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -23,6 +24,7 @@ class ParseCurrencyRateCommand extends Command
         private CurrencyRateHttpClient $client,
         private ParseFactory $parseFactory,
         private LoggerInterface $logger,
+        private CurrencyRepository $currencyRepository,
     ) {
         parent::__construct();
     }
@@ -38,6 +40,30 @@ class ParseCurrencyRateCommand extends Command
             // если админ добавил USD и EUR только, то отсортировать $result
             // так чтобы в нем были только USD и EUR и эти данные записать в БД - CurrencyRate
             // и дописать JsonParser использую команду json_decode()
+
+            // Получаем все валюты, которые есть в базе данных
+            $currencies = $this->currencyRepository->findAllCurrencies();
+
+            // Преобразуем валюты в массив с кодами валют (например, 'USD', 'EUR', и т.д.)
+            $currencyCodes = [];
+            foreach ($currencies as $currency) {
+                $currencyCodes[] = $currency->getCharCode();  // Добавляем код валюты в массив
+            }
+
+            // Массив отфильтрованных валют, полученных со стороннего сервиса cbr.ru
+            $filteredResult = [];
+            foreach ($result as $currencyFromResult) {
+                if (in_array($currencyFromResult->numCode, $currencyCodes)) {
+                    $filteredResult[] = $currencyFromResult;
+                }
+            }
+
+            dd($filteredResult);
+
+            // Записываем данные в таблицу CurrencyRate
+            foreach ($filteredResult as $currencyData) {
+
+            }
 
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());

@@ -57,6 +57,13 @@ class CurrencyRepository
         return null;
     }
 
+    public function findAllCurrencies(): array
+    {
+        $currencies = $this->repo->findAll();
+
+        return $currencies;
+    }
+
     public function add(Currency $currency): void
     {
         $this->em->persist($currency);
