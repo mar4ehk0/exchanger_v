@@ -2,9 +2,15 @@
 
 namespace App\Console;
 
+use App\DTO\CurrencyRateCreationDto;
+use App\Entity\CurrencyRate;
 use App\Factory\ParseFactory;
 use App\HttpClient\CurrencyRateHttpClient;
+use App\Repository\CurrencyRateRepository;
 use App\Repository\CurrencyRepository;
+use App\Service\CurrencyRateService;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -12,7 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-use function dd;
+use function sprintf;
 
 #[AsCommand(
     name: 'app:parse-currency-rate',
@@ -25,6 +31,8 @@ class ParseCurrencyRateCommand extends Command
         private ParseFactory $parseFactory,
         private LoggerInterface $logger,
         private CurrencyRepository $currencyRepository,
+        private CurrencyRateRepository $currencyRateRepository,
+        private EntityManagerInterface $em,
     ) {
         parent::__construct();
     }
@@ -34,40 +42,62 @@ class ParseCurrencyRateCommand extends Command
         try {
             $dto = $this->client->request();
             $parser = $this->parseFactory->create($dto->contentType);
-            $result = $parser->parse($dto);
+            $currencyRatesData = $parser->parse($dto);
 
             // сделать запрос в БД и получить все currency! какие есть в БД.
-            // если админ добавил USD и EUR только, то отсортировать $result
+            // если админ добавил USD и EUR только, то отсортировать $currencyRatesData
             // так чтобы в нем были только USD и EUR и эти данные записать в БД - CurrencyRate
             // и дописать JsonParser использую команду json_decode()
 
             // Получаем все валюты, которые есть в базе данных
             $currencies = $this->currencyRepository->findAllCurrencies();
-
-            // Преобразуем валюты в массив с кодами валют (например, 'USD', 'EUR', и т.д.)
-            $currencyCodes = [];
+            $result = [];
+            $dateParser = new DateTimeImmutable();
             foreach ($currencies as $currency) {
-                $currencyCodes[] = $currency->getCharCode();  // Добавляем код валюты в массив
-            }
+                foreach ($currencyRatesData as $currencyRateItem) {
+                    if (
+                        $currencyRateItem->charCode === $currency->getCharCode()
+                        && $currencyRateItem->numCode === $currency->getNumCode()
+                    ) {
+                        // clean architecture - martin
+                        // ddd - usecase/handler/executor.
 
-            // Массив отфильтрованных валют, полученных со стороннего сервиса cbr.ru
-            $filteredResult = [];
-            foreach ($result as $currencyFromResult) {
-                if (in_array($currencyFromResult->numCode, $currencyCodes)) {
-                    $filteredResult[] = $currencyFromResult;
+                        $currencyRate = new CurrencyRate($currency, $currencyRateItem->value, $dateParser);
+                        $this->currencyRateRepository->add($currencyRate);
+
+                        $result[] = $currencyRate;
+                    }
                 }
             }
+            $this->em->flush();
 
-            dd($filteredResult);
+            $this->showInfo($output, $result);
 
-            // Записываем данные в таблицу CurrencyRate
-            foreach ($filteredResult as $currencyData) {
-
-            }
-
+            $output->writeln('Parser finished.');
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
-            return 1;
+            return Command::FAILURE;
+        }
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param CurrencyRate[] $currencyRates
+     */
+    private function showInfo(OutputInterface $output, array $currencyRates): void
+    {
+        foreach ($currencyRates as $currencyRate) {
+            $msg = sprintf(
+                'was added valueId: %d, for currency:(numCode: %s, charCode: %s)',
+                $currencyRate->getId(),
+                $currencyRate->getCurrency()->getNumCode(),
+                $currencyRate->getCurrency()->getCharCode(),
+            );
+            $output->writeln($msg);
+
+            $this->logger->info($msg, ['currency' => $currencyRate->getCurrency(), 'currencyRate' => $currencyRate]);
         }
     }
 }

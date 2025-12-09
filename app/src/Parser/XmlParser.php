@@ -17,6 +17,10 @@ class XmlParser implements ParserInterface
     ) {
     }
 
+    /**
+     * @return ResultParsingRateDto[]
+     * @throws Exception
+     */
     public function parse(CBRFCurrencyRateDto $dto): array
     {
         $ratesData = $this->serializer->decode($dto->data, 'xml');
@@ -30,7 +34,11 @@ class XmlParser implements ParserInterface
                 continue;
             }
 
-            $result[] = new ResultParsingRateDto($rate['NumCode'], $rate['CharCode'], (float) $rate['Value']);
+            $result[] = new ResultParsingRateDto(
+                charCode: $rate['CharCode'],
+                numCode: $rate['NumCode'],
+                value: (float) $rate['Value']
+            );
         }
 
         return $result;

@@ -57,6 +57,9 @@ class CurrencyRepository
         return null;
     }
 
+    /**
+     * @return Currency[]
+     */
     public function findAllCurrencies(): array
     {
         $currencies = $this->repo->findAll();
