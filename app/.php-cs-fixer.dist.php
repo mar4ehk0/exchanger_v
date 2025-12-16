@@ -7,7 +7,7 @@ $finder = (new PhpCsFixer\Finder())
 
 return (new PhpCsFixer\Config())
     ->setRules([
-        '@PSR-12' => true,
+        '@PSR12' => true,
     ])
     ->setFinder($finder)
 ;

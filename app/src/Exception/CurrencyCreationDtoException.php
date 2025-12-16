@@ -2,10 +2,8 @@
 
 namespace App\Exception;
 
-
 class CurrencyCreationDtoException extends BaseServiceException implements DtoExceptionInterface
 {
-
     public static function missingNumCode(): self
     {
         $sysMsg = 'Validation failed: property is missing "numCode"';

@@ -19,8 +19,8 @@ class CurrencyRateCreationDto implements DtoExceptionInterface, JsonBodyDtoReque
     ) {
     }
 
-//    public static function createFromArray(array $data): self
-//    {
-//        return new self($data['currencyId'], $data['value'], $data['date']);
-//    }
+    //    public static function createFromArray(array $data): self
+    //    {
+    //        return new self($data['currencyId'], $data['value'], $data['date']);
+    //    }
 }

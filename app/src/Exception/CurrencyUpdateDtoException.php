@@ -4,7 +4,6 @@ namespace App\Exception;
 
 class CurrencyUpdateDtoException extends BaseServiceException implements DtoExceptionInterface
 {
-
     public static function missingId(): self
     {
         $sysMsg = 'Validation failed: property is missing "Id"';

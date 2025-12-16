@@ -9,10 +9,9 @@ use function json_decode;
 
 class JsonParser implements ParserInterface
 {
-
     public function parse(CBRFCurrencyRateDto $dto): array
     {
-//        json_decode($dto->data)
+        //        json_decode($dto->data)
         // TODO: Implement parse() method.
     }
 }

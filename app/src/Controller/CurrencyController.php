@@ -56,7 +56,7 @@ class CurrencyController extends BaseController
     {
         $currency = $this->currencyRepository->getById($id);
 
-//        $view = new CurrencyView($currency);
+        //        $view = new CurrencyView($currency);
 
         $currencySerialosed = $this->serializer->serialize($currency, 'json');
 
@@ -67,9 +67,9 @@ class CurrencyController extends BaseController
     public function update(int $id, CurrencyUpdateDto $dto): JsonResponse
     {
         // added some comments 12312312 3123 123 12
-//        $data = json_decode($request->getContent(), true);
-//        $data['id'] = $id;
-//        $dto = CurrencyUpdateDto::createFromArray($data);
+        //        $data = json_decode($request->getContent(), true);
+        //        $data['id'] = $id;
+        //        $dto = CurrencyUpdateDto::createFromArray($data);
 
         $errors = $this->validator->validate($dto);
         if (count($errors) > 0) {

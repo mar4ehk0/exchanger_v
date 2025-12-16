@@ -31,8 +31,7 @@ class CurrencyRate
         Currency $currency,
         string $value,
         DateTimeInterface $date,
-    )
-    {
+    ) {
         $this->currency = $currency;
         $this->value = $value;
         $this->date = $date;

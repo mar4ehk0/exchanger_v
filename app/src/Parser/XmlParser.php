@@ -9,7 +9,6 @@ use App\Interface\ParserInterface;
 use Exception;
 use Symfony\Component\Serializer\SerializerInterface;
 
-
 class XmlParser implements ParserInterface
 {
     public function __construct(
