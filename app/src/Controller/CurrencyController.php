@@ -18,7 +18,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CurrencyController extends BaseController
 {
-
     public function __construct(
         private CurrencyService $currencyService,
         private CurrencyRepository $currencyRepository,
