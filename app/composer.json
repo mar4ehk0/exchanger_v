@@ -3,6 +3,8 @@
     "license": "proprietary",
     "minimum-stability": "stable",
     "prefer-stable": true,
+    "name": "mar4ehk0/exchanger_v",
+    "description": "exchanger",
     "require": {
         "php": ">=8.3",
         "ext-ctype": "*",
