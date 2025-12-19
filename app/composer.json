@@ -3,6 +3,8 @@
     "license": "proprietary",
     "minimum-stability": "stable",
     "prefer-stable": true,
+    "name": "mar4ehk0/exchanger_v",
+    "description": "exchanger",
     "require": {
         "php": ">=8.3",
         "ext-ctype": "*",
@@ -18,7 +20,7 @@
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.3.*",
         "symfony/http-client": "7.3.*",
-        "symfony/monolog-bundle": "*",
+        "symfony/monolog-bundle": "4.0.*",
         "symfony/property-access": "7.3.*",
         "symfony/property-info": "7.3.*",
         "symfony/runtime": "7.3.*",
@@ -33,7 +35,8 @@
             "symfony/runtime": true
         },
         "bump-after-update": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "bin-dir": "bin"
     },
     "autoload": {
         "psr-4": {
@@ -77,6 +80,7 @@
         }
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.92",
         "symfony/var-dumper": "7.3.*"
     }
 }

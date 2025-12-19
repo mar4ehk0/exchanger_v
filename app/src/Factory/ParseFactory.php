@@ -13,7 +13,6 @@ use function str_contains;
 
 class ParseFactory
 {
-
     public function __construct(
         private SerializerInterface $serializer
     ) {

@@ -29,8 +29,7 @@ class Currency
         string $numCode,
         string $charCode,
         string $name,
-    )
-    {
+    ) {
         $this->numCode = $numCode;
         $this->charCode = $charCode;
         $this->name = $name;

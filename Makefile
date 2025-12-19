@@ -53,6 +53,14 @@ shell: ## Start shell into backend container
 logs: ## Show logs
 	docker logs -f ${APP_CONTAINER_NAME}
 
+.PHONY: cs-check
+cs-check: ## Checks Code Style PHP
+	docker exec -ti ${APP_CONTAINER_NAME} php ./bin/php-cs-fixer check --diff
+
+.PHONY: cs-fix
+cs-fix: ## Fixes Code Style PHP
+	docker exec -ti ${APP_CONTAINER_NAME} php ./bin/php-cs-fixer fix --diff
+
 .PHONY: info
 info: ## Show info
 	echo '****************************************'
