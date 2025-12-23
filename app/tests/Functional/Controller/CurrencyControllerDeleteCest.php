@@ -35,7 +35,8 @@ class CurrencyControllerDeleteCest extends AbstractEndpointClass
         $this->actor->seeResponseCodeIs(HttpCode::OK);
         $this->actor->assertEquals($currencyId, $data['id']);
         $this->actor->dontSeeInRepository(
-            Currency::class, ['id' => $currencyId]
+            Currency::class,
+            ['id' => $currencyId]
         );
     }
 }
