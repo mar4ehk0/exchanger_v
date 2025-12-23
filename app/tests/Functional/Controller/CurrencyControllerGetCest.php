@@ -16,6 +16,15 @@ class CurrencyControllerGetCest extends AbstractEndpointClass
         return new Endpoint('GET', '/currencies/{id}');
     }
 
+    public function testFailNoCurrency()
+    {
+        // act
+        $data = $this->sendRequest(placeholders: ['{id}' => 2147483647]);
+
+        // assert
+        $this->actor->seeResponseCodeIs(HttpCode::NOT_FOUND);
+    }
+
     public function testCan()
     {
         // arrange
