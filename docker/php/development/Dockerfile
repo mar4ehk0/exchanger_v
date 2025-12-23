@@ -51,3 +51,4 @@ USER ${USER_NAME}
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+COPY php/development/.bash_aliases /home/${USER_NAME}/.bash_aliases
