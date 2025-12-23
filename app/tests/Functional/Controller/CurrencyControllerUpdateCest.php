@@ -16,6 +16,157 @@ class CurrencyControllerUpdateCest extends AbstractEndpointClass
         return new Endpoint('PUT', '/currencies/{id}');
     }
 
+    public function testFailWrongParametrNumCode()
+    {
+        // arrange
+        $currencyId = $this->actor->haveInRepository(
+            Currency::class,
+            [
+                'numCode' => 123,
+                'charCode' => 'e1231',
+                'name' => 'euro'
+            ]
+        );
+        $data = [
+            'numCode' => '',
+            'charCode' => 'e1231',
+            'name' => 'super-euro'
+        ];
+
+        // act
+        $data = $this->sendRequest(
+            placeholders: ['{id}' => $currencyId],
+            bodyParameters: $data
+        );
+
+        // assert
+        $this->actor->seeResponseCodeIs(HttpCode::BAD_REQUEST);
+    }
+
+    public function testFailWrongParametrCharCode()
+    {
+        // arrange
+        $currencyId = $this->actor->haveInRepository(
+            Currency::class,
+            [
+                'numCode' => 123,
+                'charCode' => 'e1231',
+                'name' => 'euro'
+            ]
+        );
+        $data = [
+            'numCode' => '123',
+            'charCode' => '',
+            'name' => 'super-euro'
+        ];
+
+        // act
+        $data = $this->sendRequest(
+            placeholders: ['{id}' => $currencyId],
+            bodyParameters: $data
+        );
+
+        // assert
+        $this->actor->seeResponseCodeIs(HttpCode::BAD_REQUEST);
+    }
+
+    public function testFailWrongParametrName()
+    {
+        // arrange
+        $currencyId = $this->actor->haveInRepository(
+            Currency::class,
+            [
+                'numCode' => 123,
+                'charCode' => 'e1231',
+                'name' => 'euro'
+            ]
+        );
+        $data = [
+            'numCode' => '123',
+            'charCode' => 'e1231',
+            'name' => ''
+        ];
+
+        // act
+        $data = $this->sendRequest(
+            placeholders: ['{id}' => $currencyId],
+            bodyParameters: $data
+        );
+
+        // assert
+        $this->actor->seeResponseCodeIs(HttpCode::BAD_REQUEST);
+    }
+
+    public function testFailNotUniqueNumCode()
+    {
+        // arrange
+        $this->actor->haveInRepository(
+            Currency::class,
+            [
+                'numCode' => 123,
+                'charCode' => 'e1231',
+                'name' => 'euro'
+            ]
+        );
+        $currencyId = $this->actor->haveInRepository(
+            Currency::class,
+            [
+                'numCode' => 923,
+                'charCode' => 'e9231',
+                'name' => 'euro'
+            ]
+        );
+        $data = [
+            'numCode' => '123',
+            'charCode' => 'e9231',
+            'name' => 'super-euro'
+        ];
+
+        // act
+        $data = $this->sendRequest(
+            placeholders: ['{id}' => $currencyId],
+            bodyParameters: $data
+        );
+
+        // assert
+        $this->actor->seeResponseCodeIs(HttpCode::INTERNAL_SERVER_ERROR);
+    }
+
+    public function testFailNotUniqueCharCode()
+    {
+        // arrange
+        $this->actor->haveInRepository(
+            Currency::class,
+            [
+                'numCode' => 123,
+                'charCode' => 'e1231',
+                'name' => 'euro'
+            ]
+        );
+        $currencyId = $this->actor->haveInRepository(
+            Currency::class,
+            [
+                'numCode' => 923,
+                'charCode' => 'e9231',
+                'name' => 'euro'
+            ]
+        );
+        $data = [
+            'numCode' => '923',
+            'charCode' => 'e1231',
+            'name' => 'super-euro'
+        ];
+
+        // act
+        $data = $this->sendRequest(
+            placeholders: ['{id}' => $currencyId],
+            bodyParameters: $data
+        );
+
+        // assert
+        $this->actor->seeResponseCodeIs(HttpCode::INTERNAL_SERVER_ERROR);
+    }
+
     public function testCan()
     {
         // arrange
